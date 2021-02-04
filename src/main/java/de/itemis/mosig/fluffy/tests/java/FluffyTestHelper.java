@@ -2,15 +2,23 @@ package de.itemis.mosig.fluffy.tests.java;
 
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.assertj.core.api.Condition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class FluffyTestHelper {
 
@@ -28,6 +36,7 @@ public class FluffyTestHelper {
      * <ul>
      * <li>It has exactly one constructor.</li>
      * <li>The constructor is private.</li>
+     * <li>The constructor is a no args constructor</li>
      * <li>The constructor throws a {@link Throwable} if it is invoked by reflection.</li>
      * </ul>
      * </p>
@@ -49,8 +58,13 @@ public class FluffyTestHelper {
      * @param clazz
      */
     public static void assertNotInstantiatable(Class<?> clazz) {
+        internalAssertNonInstantiatable(clazz);
+    }
+
+    private static Optional<Throwable> internalAssertNonInstantiatable(Class<?> clazz) {
         requireNonNull(clazz, "clazz");
 
+        Optional<Throwable> result = empty();
         boolean isAbstract = Modifier.isAbstract(clazz.getModifiers());
 
         if (!isAbstract) {
@@ -69,16 +83,53 @@ public class FluffyTestHelper {
             Exception thrownException = null;
             try {
                 constructor.newInstance();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 thrownException = e;
             }
             assertThat(thrownException).as("Encountered working private constructor.").isInstanceOf(InvocationTargetException.class);
+            result = Optional.ofNullable(thrownException.getCause());
         }
+
+        return result;
+    }
+
+    /**
+     * <p>
+     * Convenience method. Assert that the provided class is a valid static helper. This is the case
+     * when:
+     * <ul>
+     * <li>The class is declared final.</li>
+     * <li>The class does not have any non static methods, except for those inherited from
+     * {@link Object}.</li>
+     * <li>The class does not inherit from any abstract base class.</li>
+     * <li>The class has exactly one private no args constructor which must throw an
+     * {@link InstantiationNotPermittedException}.</li>
+     * </ul>
+     *
+     * @param clazz
+     */
+    public static void assertIsStaticHelper(Class<?> clazz) {
+        requireNonNull(clazz, "clazz");
+
+        assertFinal(clazz);
+        var exceptionThrownByConstructor = internalAssertNonInstantiatable(clazz);
+
+        if (exceptionThrownByConstructor.isPresent()) {
+            var exceptionThrownByConstructorValue = exceptionThrownByConstructor.get();
+            assertThat(exceptionThrownByConstructorValue).as("Constructor threw the wrong kind of exception.")
+                .isExactlyInstanceOf(InstantiationNotPermittedException.class);
+        } else {
+            fail("Encountered unexpected behavior: Instantiating " + clazz.getSimpleName() + " caused an "
+                + InvocationTargetException.class.getSimpleName() + " with a null cause.");
+        }
+
+
+        List<Method> publicMethodCandidates =
+            asList(clazz.getMethods()).stream().filter(method -> !method.getDeclaringClass().equals(Object.class)).collect(toList());
+        assertThat(publicMethodCandidates).as("Static helper classes must not have any non static methods.")
+            .allMatch(method -> isStatic(method.getModifiers()));
+
+        assertThat(asList(clazz.getDeclaredMethods())).as("Static helper classes must not have any non static methods.")
+            .allMatch(method -> isStatic(method.getModifiers()));
     }
 }

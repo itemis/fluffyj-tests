@@ -1,6 +1,7 @@
 package de.itemis.mosig.fluffy.tests.java;
 
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertFinal;
+import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertIsStaticHelper;
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertNotInstantiatable;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -97,6 +98,43 @@ public class NonInstantiatableTest {
             "The void primitive must be non instantiatable per definition.");
     }
 
+    @Test
+    public void assert_static_helper_fails_on_non_final_class() {
+        assertThatThrownBy(() -> assertIsStaticHelper(NonFinalTestClass.class), "Non final classes must not pass the assertion.")
+            .hasMessageContaining("Class must be declared final.").isInstanceOf(AssertionError.class);
+    }
+
+    @Test
+    public void assert_static_helper_fails_on_instantiatable_final_class() {
+        assertThatThrownBy(() -> assertIsStaticHelper(InstantiatableFinalClass.class)).isInstanceOf(AssertionError.class)
+            .hasMessageContaining("Encountered working private constructor.");
+    }
+
+    @Test
+    public void assert_static_helper_fails_on_wrong_exception_thrown_by_constructor() {
+        assertThatThrownBy(() -> assertIsStaticHelper(NonInstantiatableFinalClassWithWrongException.class)).isInstanceOf(AssertionError.class)
+            .hasMessageContaining("Constructor threw the wrong kind of exception.");
+    }
+
+
+    @Test
+    public void assert_static_helper_fails_on_any_public_static_method() {
+        assertThatThrownBy(() -> assertIsStaticHelper(ClassWithNonStaticPublicMethod.class)).isInstanceOf(AssertionError.class)
+            .hasMessageContaining("Static helper classes must not have any non static methods.");
+    }
+
+    @Test
+    public void assert_static_helper_fails_on_any_non_public_static_method() {
+        assertThatThrownBy(() -> assertIsStaticHelper(ClassWithNonStaticPrivateMethod.class)).isInstanceOf(AssertionError.class)
+            .hasMessageContaining("Static helper classes must not have any non static methods.");
+    }
+
+    @Test
+    public void assert_static_helper_passes_on_valid_helper() {
+        assertDoesNotThrow(() -> assertIsStaticHelper(ValidStaticHelper.class),
+            "Valid static helper classes must pass this test.");
+    }
+
     public static final class FinalTestClass {
 
     }
@@ -142,5 +180,49 @@ public class NonInstantiatableTest {
 
     public static interface TestInterface {
 
+    }
+
+    public static final class InstantiatableFinalClass {
+        private InstantiatableFinalClass() {}
+    }
+
+    public static final class NonInstantiatableFinalClassWithWrongException {
+        private NonInstantiatableFinalClassWithWrongException() {
+            throw new RuntimeException("expected exception");
+        }
+    }
+
+    public static final class ClassWithNonStaticPublicMethod {
+        private ClassWithNonStaticPublicMethod() {
+            throw new InstantiationNotPermittedException();
+        }
+
+        public void nonStaticMethod() {}
+    }
+
+    public static final class ClassWithNonStaticPrivateMethod {
+        private ClassWithNonStaticPrivateMethod() {
+            throw new InstantiationNotPermittedException();
+        }
+
+        // Only accessed by reflection
+        @SuppressWarnings("unused")
+        private void nonStaticMethod() {}
+    }
+
+    public static final class ValidStaticHelper {
+        private ValidStaticHelper() {
+            throw new InstantiationNotPermittedException();
+        }
+
+        // Only accessed by reflection
+        @SuppressWarnings("unused")
+        private static void privateTestMethod() {};
+
+        static void packagePrivateTestMethod() {};
+
+        protected static void protectedTestMethod() {};
+
+        public static void publicTestMethod() {};
     }
 }
