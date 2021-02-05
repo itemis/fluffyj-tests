@@ -17,6 +17,9 @@ package de.itemis.mosig.fluffy.tests.java;
  * </p>
  */
 public final class InstantiationNotPermittedException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
     public InstantiationNotPermittedException() {
         super("Instantiation of class not permitted.");
     }

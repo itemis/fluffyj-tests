@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.assertj.core.api.Condition;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -131,5 +132,15 @@ public class FluffyTestHelper {
 
         assertThat(asList(clazz.getDeclaredMethods())).as("Static helper classes must not have any non static methods.")
             .allMatch(method -> isStatic(method.getModifiers()));
+    }
+
+    public static void assertSerialVersionUid(Class<?> clazz) {
+        Condition<Field> serialVersionUID = new Condition<Field>(field -> {
+            int modifiers = field.getModifiers();
+            return isPrivate(modifiers) && isStatic(modifiers) && isFinal(modifiers) && field.getType() == long.class
+                && "serialVersionUID".equals(field.getName());
+        }, "private static final long serialVersionUID");
+
+        assertThat(clazz.getDeclaredFields()).haveAtLeastOne(serialVersionUID);
     }
 }
