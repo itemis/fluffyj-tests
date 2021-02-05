@@ -44,7 +44,6 @@ public class AppTest {
     public void test_something() throws Exception {
         assertThat(true).isTrue();
 
-        App.main(null);
         LOG.debug("Log from test");
 
         var request = newBuilder().uri(new URI("http", null, "localhost", port, "/some/thing", null, null)).GET().build();
