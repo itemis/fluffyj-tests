@@ -1,4 +1,4 @@
-package de.itemis.mosig.fluffy.tests.java;
+package de.itemis.mosig.fluffy.tests.java.exceptions;
 
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertFinal;
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertSerialVersionUid;

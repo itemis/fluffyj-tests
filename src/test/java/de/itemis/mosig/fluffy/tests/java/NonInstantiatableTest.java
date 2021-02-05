@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
+import de.itemis.mosig.fluffy.tests.java.exceptions.InstantiationNotPermittedException;
+
 public class NonInstantiatableTest {
 
     @Test

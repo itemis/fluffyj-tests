@@ -1,8 +1,8 @@
-package de.itemis.mosig.fluffy.tests.java;
+package de.itemis.mosig.fluffy.tests.java.exceptions;
 
-import static de.itemis.mosig.fluffy.tests.java.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
-import static de.itemis.mosig.fluffy.tests.java.ExpectedExceptions.EXPECTED_UNCHECKED_EXCEPTION;
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertIsStaticHelper;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_UNCHECKED_EXCEPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

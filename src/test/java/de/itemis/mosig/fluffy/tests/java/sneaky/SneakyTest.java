@@ -1,8 +1,8 @@
 package de.itemis.mosig.fluffy.tests.java.sneaky;
 
-import static de.itemis.mosig.fluffy.tests.java.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
-import static de.itemis.mosig.fluffy.tests.java.ExpectedExceptions.EXPECTED_UNCHECKED_EXCEPTION;
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertIsStaticHelper;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_UNCHECKED_EXCEPTION;
 import static de.itemis.mosig.fluffy.tests.java.sneaky.Sneaky.throwThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

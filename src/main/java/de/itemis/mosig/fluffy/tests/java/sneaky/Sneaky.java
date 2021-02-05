@@ -1,6 +1,6 @@
 package de.itemis.mosig.fluffy.tests.java.sneaky;
 
-import de.itemis.mosig.fluffy.tests.java.InstantiationNotPermittedException;
+import de.itemis.mosig.fluffy.tests.java.exceptions.InstantiationNotPermittedException;
 
 /**
  * <p>

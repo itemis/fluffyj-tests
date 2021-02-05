@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import de.itemis.mosig.fluffy.tests.java.exceptions.InstantiationNotPermittedException;
+
 public class FluffyTestHelper {
 
     public static void assertFinal(Class<?> clazz) {

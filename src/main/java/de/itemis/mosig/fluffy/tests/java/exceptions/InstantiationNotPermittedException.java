@@ -1,4 +1,4 @@
-package de.itemis.mosig.fluffy.tests.java;
+package de.itemis.mosig.fluffy.tests.java.exceptions;
 
 /**
  * <p>
