@@ -8,44 +8,43 @@
     <artifactId>de.itemis.mosig.fluffy.tests.java</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>Add a fluffy name here</name>
-    <description>Add a fluffy description here</description>
+    <name>Fluffy Tests</name>
+    <description>A library that aims at making your test easier to understand.</description>
 
     <packaging>jar</packaging>
 
     <licenses>
         <license>
-            <name>License name goes here</name>
-            <url>some.url.to.the.license</url>
-            <distribution>manual</distribution>
+            <name>Eclipse Public License - v2.0</name>
+            <url>https://www.eclipse.org/legal/epl-2.0</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
     <developers>
         <developer>
-            <id>DevId</id>
-            <name>Full name</name>
-            <organization>Optional organization</organization>
-            <organizationUrl>some.organization.url</organizationUrl>
-            <email>some@email.address</email>
+            <id>JMO</id>
+            <name>Jan Mosig</name>
+            <organization>itemis AG</organization>
+            <organizationUrl>www.itemis.com</organizationUrl>
+            <email>jan.mosig@itemis.de</email>
             <timezone>Europe/Berlin</timezone>
-            <url>dev's website</url>
+            <url>https://github.com/JanMosigItemis</url>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:url.to.git.repo</connection>
-        <developerConnection>scm:git:url.to.git.repo</developerConnection>
+        <connection>scm:git:https://github.com/JanMosigItemis/fluffy-tests-java.git</connection>
         <tag>HEAD</tag>
-        <url>url.to.git.repo</url>
+        <url>https://github.com/JanMosigItemis/fluffy-tests-java.git</url>
     </scm>
 
     <organization>
-        <name>organization's name</name>
-        <url>organization.url</url>
+        <name>itemis AG</name>
+        <url>www.itemis.com</url>
     </organization>
 
-    <url>project.website</url>
+    <url>https://github.com/JanMosigItemis/fluffy-tests-java</url>
 
     <properties>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
@@ -78,6 +77,9 @@
         <equalsverifier.version>3.5.2</equalsverifier.version>
         <awaitility.version>4.0.3</awaitility.version>
         <wiremock.version>2.27.2</wiremock.version>
+        <!-- Currently no custom options are set but we need to define this variable
+            anyway, so that it gets replaced with 'empty' upon runtime. -->
+        <custom.jvm.options></custom.jvm.options>
     </properties>
 
     <dependencyManagement>
@@ -233,10 +235,35 @@
                     <version>${jacoco.plugin.version}</version>
                     <executions>
                         <execution>
-                            <id>default-prepare-agent</id>
+                            <id>prepare-unit-tests</id>
                             <goals>
                                 <goal>prepare-agent</goal>
                             </goals>
+                        </execution>
+                        <execution>
+                            <id>jacoco-site</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report</goal>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <rule>
+                                        <element>CLASS</element>
+                                        <excludes>
+                                            <exclude>*Test</exclude>
+                                        </excludes>
+                                        <limits>
+                                            <limit>
+                                                <counter>LINE</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>80%</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -337,7 +364,8 @@
                     <!-- Try to avoid concurrency issues as much as possible. -->
                     <!-- This will have a negative impact on memory consumption an build speed. -->
                     <reuseForks>false</reuseForks>
-                    <argLine>${jvm.options}</argLine>
+                    <!-- $argLine is 'injected' by JaCoCo and contains instructions to setup its agent -->
+                    <argLine>${argLine} ${custom.jvm.options}</argLine>
                 </configuration>
             </plugin>
             <plugin>

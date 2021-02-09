@@ -1,11 +1,11 @@
 package de.itemis.mosig.fluffy.tests.java.concurrency;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import de.itemis.mosig.fluffy.tests.java.exceptions.InstantiationNotPermittedException;
 
@@ -16,14 +16,25 @@ public final class FluffyLatches {
     }
 
     public static void assertLatch(CountDownLatch latch, Duration timeout) {
-        boolean latchWasZero = false;
+        requireNonNull(latch, "latch");
+        requireNonNull(timeout, "timeout");
+
+        boolean latchWasZero = waitOnLatch(latch, timeout);
+        assertThat(latchWasZero).as("Waiting on latch to become zero timed out.").isTrue();
+    }
+
+    public static boolean waitOnLatch(CountDownLatch latch, Duration timeout) {
+        requireNonNull(latch, "latch");
+        requireNonNull(timeout, "timeout");
+
+        boolean result = false;
         try {
-            latchWasZero = latch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            result = latch.await(timeout.toMillis(), MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            fail("Was interrupted while waiting on latch to become zero.", e);
+            throw new RuntimeException("Was interrupted while waiting on latch to become zero.", e);
         }
 
-        assertThat(latchWasZero).as("Waiting on latch to become zero timed out.").isTrue();
+        return result;
     }
 }

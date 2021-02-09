@@ -5,13 +5,15 @@ import java.util.concurrent.TimeUnit;
 
 public final class FluffyExecutors {
 
-    public static void kill(ExecutorService executor) {
+    public static boolean kill(ExecutorService executor) {
         executor.shutdownNow();
+        boolean result = false;
         try {
-            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+            result = executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
+
+        return result;
     }
 }

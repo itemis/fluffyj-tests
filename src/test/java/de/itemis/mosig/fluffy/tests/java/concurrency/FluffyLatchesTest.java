@@ -3,6 +3,8 @@ package de.itemis.mosig.fluffy.tests.java.concurrency;
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertIsStaticHelper;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyExecutors.kill;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyLatches.assertLatch;
+import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyLatches.waitOnLatch;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -89,8 +91,61 @@ public class FluffyLatchesTest {
         }
 
         kill(executor);
-        assertThatThrownBy(() -> future.get(DEFAULT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS)).isInstanceOf(ExecutionException.class)
-            .hasCauseInstanceOf(AssertionError.class).getCause().hasMessageContaining("Was interrupted while waiting on latch to become zero.");
+        assertThatThrownBy(() -> future.get(DEFAULT_TIMEOUT.toMillis(), MILLISECONDS)).isInstanceOf(ExecutionException.class)
+            .hasCauseInstanceOf(RuntimeException.class).getCause().hasMessageContaining("Was interrupted while waiting on latch to become zero.")
+            .hasCauseExactlyInstanceOf(InterruptedException.class);
+
+        assertThat(interruptedFlagPreserved).as("Interrupted assert does not preserve interrupt flag.").isTrue();
+    }
+
+    @Test
+    public void waitOnLatch_passes_if_latch_is_zero() {
+        CountDownLatch latch = new CountDownLatch(0);
+        assertThat(waitOnLatch(latch, DEFAULT_TIMEOUT)).as("Encountered unexpected return value.").isTrue();
+    }
+
+    @Test
+    public void waitOnLatch_fails_if_latch_is_non_zero() {
+        CountDownLatch latch = new CountDownLatch(1);
+        assertThat(waitOnLatch(latch, DEFAULT_TIMEOUT)).as("Encountered unexpected return value.").isFalse();
+    }
+
+    @Test
+    public void waitOnLatch_waits_timeout() {
+        CountDownLatch latch = new CountDownLatch(1);
+        Duration expectedDuration = Duration.ofSeconds(1);
+        long startTime = System.currentTimeMillis();
+        waitOnLatch(latch, expectedDuration);
+        long endTime = System.currentTimeMillis();
+        assertThat(endTime - startTime).as("Encountered unexpected waiting time.").isGreaterThanOrEqualTo(expectedDuration.toMillis());
+    }
+
+    @Test
+    public void waitOnLatch_fails_when_wait_is_interrupted_and_preserves_interrupt_flag() {
+        CountDownLatch latch = new CountDownLatch(1);
+        CountDownLatch futureStartedLatch = new CountDownLatch(1);
+
+        AtomicBoolean interruptedFlagPreserved = new AtomicBoolean(false);
+        Future<?> future = executor.submit(() -> {
+            futureStartedLatch.countDown();
+            try {
+                waitOnLatch(latch, DEFAULT_TIMEOUT);
+            } catch (Throwable t) {
+                interruptedFlagPreserved.set(Thread.currentThread().isInterrupted());
+                throw t;
+            }
+        });
+
+        try {
+            futureStartedLatch.await(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            fail("Was interrupted while waiting on latch to become zero.", e);
+        }
+
+        kill(executor);
+        assertThatThrownBy(() -> future.get(DEFAULT_TIMEOUT.toMillis(), MILLISECONDS)).isInstanceOf(ExecutionException.class)
+            .hasCauseInstanceOf(RuntimeException.class).getCause().hasMessageContaining("Was interrupted while waiting on latch to become zero.")
+            .hasCauseExactlyInstanceOf(InterruptedException.class);
 
         assertThat(interruptedFlagPreserved).as("Interrupted assert does not preserve interrupt flag.").isTrue();
     }
