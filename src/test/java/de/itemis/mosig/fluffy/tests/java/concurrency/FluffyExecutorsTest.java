@@ -1,5 +1,6 @@
 package de.itemis.mosig.fluffy.tests.java.concurrency;
 
+import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertIsStaticHelper;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyExecutors.kill;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.scheduleInterruptibleFuture;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.scheduleNeverendingFuture;
@@ -51,6 +52,11 @@ public class FluffyExecutorsTest {
         if (!done) {
             System.err.println("[WARNING] Possible resource leak: Executor could possibly not terminate all tasks.");
         }
+    }
+
+    @Test
+    public void is_static_helper() {
+        assertIsStaticHelper(FluffyExecutors.class);
     }
 
     @Test

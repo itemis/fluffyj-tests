@@ -23,8 +23,22 @@ import java.util.Optional;
 
 import de.itemis.mosig.fluffy.tests.java.exceptions.InstantiationNotPermittedException;
 
-public class FluffyTestHelper {
+/**
+ * Arbitrary convenience methods to make test code easier to read. In case of error they will
+ * usually throw {@link AssertionError AssertionErrors} in order to better integrate with JUnit etc.
+ * tests.
+ */
+public final class FluffyTestHelper {
 
+    private FluffyTestHelper() {
+        throw new InstantiationNotPermittedException();
+    }
+
+    /**
+     * Assert that the provided {@code clazz} is declared {@code final}.
+     *
+     * @param clazz
+     */
     public static void assertFinal(Class<?> clazz) {
         requireNonNull(clazz, "clazz");
         assertThat(isFinal(clazz.getModifiers())).as("Class must be declared final.").isTrue();
@@ -136,7 +150,23 @@ public class FluffyTestHelper {
             .allMatch(method -> isStatic(method.getModifiers()));
     }
 
+    /**
+     * <p>
+     * Assert that the provided {@code clazz} has at least one member with the following properties:
+     * <ul>
+     * <li>It is declared private.</li>
+     * <li>It is declared static.</li>
+     * <li>It is declared final.</li>
+     * <li>Its type is long.</li>
+     * <li>Its name is serialVersionUID</li>
+     * </ul>
+     * </p>
+     *
+     * @param clazz
+     */
     public static void assertSerialVersionUid(Class<?> clazz) {
+        requireNonNull(clazz, "clazz");
+
         Condition<Field> serialVersionUID = new Condition<Field>(field -> {
             int modifiers = field.getModifiers();
             return isPrivate(modifiers) && isStatic(modifiers) && isFinal(modifiers) && field.getType() == long.class

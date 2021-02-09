@@ -20,6 +20,9 @@ public final class InstantiationNotPermittedException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Construct a new instance.
+     */
     public InstantiationNotPermittedException() {
         super("Instantiation of class not permitted.");
     }
