@@ -41,7 +41,7 @@ public final class FluffyExecutors {
         executor.shutdownNow();
         boolean result = false;
         try {
-            result = executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+            result = executor.awaitTermination(2000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

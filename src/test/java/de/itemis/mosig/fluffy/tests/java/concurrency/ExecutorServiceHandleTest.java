@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ExecutorServiceHandleTest {
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
     private static final int THREAD_COUNT = 100;
 
     private ExecutorService executor;
@@ -114,7 +114,7 @@ public class ExecutorServiceHandleTest {
         executor.submit(() -> {
             latch.countDown();
             killReturnValue.set(kill(localExecutor));
-            interruptFlagSet.set(Thread.currentThread().isInterrupted());
+            interruptFlagSet.set(currentThread().isInterrupted());
         });
 
         try {

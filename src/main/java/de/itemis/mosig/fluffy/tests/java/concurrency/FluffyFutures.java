@@ -20,7 +20,7 @@ import de.itemis.mosig.fluffy.tests.java.exceptions.InstantiationNotPermittedExc
  */
 public final class FluffyFutures {
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
 
     private FluffyFutures() {
         throw new InstantiationNotPermittedException();

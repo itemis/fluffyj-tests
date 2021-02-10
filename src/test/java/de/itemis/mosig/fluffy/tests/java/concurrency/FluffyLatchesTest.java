@@ -85,7 +85,7 @@ public class FluffyLatchesTest {
         });
 
         try {
-            futureStartedLatch.await(5, TimeUnit.SECONDS);
+            futureStartedLatch.await(DEFAULT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             fail("Was interrupted while waiting on latch to become zero.", e);
         }
@@ -137,7 +137,7 @@ public class FluffyLatchesTest {
         });
 
         try {
-            futureStartedLatch.await(5, TimeUnit.SECONDS);
+            futureStartedLatch.await(DEFAULT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             fail("Was interrupted while waiting on latch to become zero.", e);
         }

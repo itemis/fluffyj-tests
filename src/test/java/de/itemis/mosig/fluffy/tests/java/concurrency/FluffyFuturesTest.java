@@ -8,8 +8,8 @@ import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.schedu
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.waitOnFuture;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyLatches.waitOnLatch;
 import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_UNCHECKED_EXCEPTION;
+import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
@@ -32,8 +32,8 @@ import de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.NeverendingFu
 public class FluffyFuturesTest {
 
     private static final int THREAD_COUNT = 1;
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(2000);
-    private static final Duration EXTENDED_TIMEOUT = DEFAULT_TIMEOUT.plusSeconds(1);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
+    private static final Duration EXTENDED_TIMEOUT = DEFAULT_TIMEOUT.plusMillis(200);
     private ExecutorService executor;
     private ExecutorService anotherExecutor;
 
@@ -120,7 +120,7 @@ public class FluffyFuturesTest {
             try {
                 waitOnFuture(neverendingFuture, DEFAULT_TIMEOUT);
             } catch (Throwable t) {
-                interruptedFlagPreserved.set(Thread.currentThread().isInterrupted());
+                interruptedFlagPreserved.set(currentThread().isInterrupted());
                 throw t;
             }
         });
@@ -148,7 +148,7 @@ public class FluffyFuturesTest {
     public void scheduleExceptionalFuture_schedules_a_future_that_throws_expected_exception() {
         Future<?> future = scheduleExceptionalFuture(executor, EXPECTED_UNCHECKED_EXCEPTION);
 
-        assertThatThrownBy(() -> future.get(DEFAULT_TIMEOUT.getSeconds(), SECONDS), "Future did not throw expected exception.")
+        assertThatThrownBy(() -> future.get(DEFAULT_TIMEOUT.toMillis(), MILLISECONDS), "Future did not throw expected exception.")
             .isInstanceOf(ExecutionException.class)
             .hasCauseReference(EXPECTED_UNCHECKED_EXCEPTION);
     }

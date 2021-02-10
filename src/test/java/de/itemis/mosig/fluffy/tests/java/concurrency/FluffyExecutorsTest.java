@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FluffyExecutorsTest {
 
-    private static final int DEFAULT_TIMEOUT_SECONDS = 5;
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS);
+    private static final int DEFAULT_TIMEOUT_MILLIS = 500;
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(DEFAULT_TIMEOUT_MILLIS);
     private static final int THREAD_COUNT = 2;
 
     private ExecutorService executor;
@@ -43,8 +43,8 @@ public class FluffyExecutorsTest {
         boolean done = false;
 
         try {
-            done = executor.awaitTermination(DEFAULT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                && anotherExecutor.awaitTermination(DEFAULT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            done = executor.awaitTermination(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+                && anotherExecutor.awaitTermination(DEFAULT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             done = false;
         }
