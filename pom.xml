@@ -77,6 +77,7 @@
         <equalsverifier.version>3.5.2</equalsverifier.version>
         <awaitility.version>4.0.3</awaitility.version>
         <wiremock.version>2.27.2</wiremock.version>
+        <arch.unit.version>0.16.0</arch.unit.version>
         <!-- Currently no custom options are set but we need to define this variable
             anyway, so that it gets replaced with 'empty' upon runtime. -->
         <custom.jvm.options></custom.jvm.options>
@@ -120,6 +121,13 @@
                 <groupId>org.junit.vintage</groupId>
                 <artifactId>junit-vintage-engine</artifactId>
                 <version>${junit.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.tngtech.archunit/archunit-junit5 -->
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit5</artifactId>
+                <version>${arch.unit.version}</version>
+                <scope>test</scope>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
             <dependency>
@@ -188,6 +196,10 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
