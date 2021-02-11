@@ -3,7 +3,6 @@ package de.itemis.mosig.fluffy.tests.java.concurrency;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyExecutors.kill;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.scheduleInterruptibleFuture;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.scheduleNeverendingFuture;
-import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyFutures.waitOnFuture;
 import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyLatches.assertLatch;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newFixedThreadPool;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -28,14 +28,19 @@ public class ExecutorServiceHandleTest {
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
     private static final int THREAD_COUNT = 100;
+    private static final String EXPECTED_THREAD_NAME = "expectedThreadName";
 
+    private ThreadNameFactory threadNameFactoryMock;
+    private List<ExecutorService> createdExecutors = new CopyOnWriteArrayList<>();
     private ExecutorService executor;
+
     private ExecutorServiceHandle underTest;
 
     @BeforeEach
     public void setUp() {
+        threadNameFactoryMock = () -> EXPECTED_THREAD_NAME;
         executor = newFixedThreadPool(THREAD_COUNT);
-        underTest = constructUnderTest();
+        underTest = constructUnderTest(threadNameFactoryMock);
     }
 
     @AfterEach
@@ -45,34 +50,22 @@ public class ExecutorServiceHandleTest {
 
     @Test
     public void get_executor_returns_executor() {
-        assertThat(constructUnderTest().getExecutor()).isNotNull();
+        assertThat(underTest.getExecutor()).isNotNull();
     }
 
     @Test
     public void calling_get_executor_twice_returns_same_executor_instance() {
-        ExecutorServiceHandle underTest = constructUnderTest();
         ExecutorService firstResult = underTest.getExecutor();
         ExecutorService secondResult = underTest.getExecutor();
         assertThat(firstResult).isSameAs(secondResult);
     }
 
+    @AssertThreadSafety(threadCount = THREAD_COUNT)
     @Test
     public void get_executor_is_thread_safe() {
-        ExecutorServiceHandle underTest = constructUnderTest();
-        List<Future<ExecutorService>> futures = new ArrayList<>();
-        try {
-            for (int a = 0; a < THREAD_COUNT; a++) {
-                futures.add(executor.submit(() -> underTest.getExecutor()));
-            }
-        } finally {
-            for (var future : futures) {
-                kill(waitOnFuture(future, DEFAULT_TIMEOUT));
-            }
-        }
-
-        ExecutorService firstExecutor = waitOnFuture(futures.get(0), DEFAULT_TIMEOUT);
-        assertThat(futures).as("getter must always return the same instance.")
-            .allMatch(future -> waitOnFuture(future, DEFAULT_TIMEOUT) == firstExecutor);
+        ExecutorService currentExecutor = underTest.getExecutor();
+        createdExecutors.add(currentExecutor);
+        assertThat(createdExecutors).as("getter must always return the same instance.").allMatch(executor -> executor == currentExecutor);
     }
 
     @Test
@@ -130,8 +123,7 @@ public class ExecutorServiceHandleTest {
 
     @Test
     public void constructor_takes_thread_count_into_account() {
-        var localUnderTest = constructUnderTest();
-        var localExecutor = localUnderTest.getExecutor();
+        var localExecutor = underTest.getExecutor();
         AtomicInteger actualThreadCount = new AtomicInteger(0);
         CountDownLatch startLatch = new CountDownLatch(THREAD_COUNT);
         CountDownLatch releaseLatch = new CountDownLatch(1);
@@ -160,22 +152,21 @@ public class ExecutorServiceHandleTest {
         });
 
         assertLatch(latch, DEFAULT_TIMEOUT);
-        assertThat(actualThreadName.get()).as("Encountered unexpected thread name.").startsWith(getClass().getSimpleName() + "-Thread");
+        assertThat(actualThreadName.get()).as("Encountered unexpected thread name.").isEqualTo(EXPECTED_THREAD_NAME);
     }
 
     @Test
     public void constructor_does_not_accept_invalid_thread_count() {
         String expectedMessage = "Thread count must be gte 0.";
-        String expectedName = "expectedName";
 
-        assertThatThrownBy(() -> new ExecutorServiceHandle(-1, expectedName)).isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> new ExecutorServiceHandle(-1, threadNameFactoryMock)).isInstanceOf(IllegalArgumentException.class)
             .hasMessage(expectedMessage);
 
-        assertThatThrownBy(() -> new ExecutorServiceHandle(0, expectedName)).isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> new ExecutorServiceHandle(0, threadNameFactoryMock)).isInstanceOf(IllegalArgumentException.class)
             .hasMessage(expectedMessage);
     }
 
-    private ExecutorServiceHandle constructUnderTest() {
-        return new ExecutorServiceHandle(THREAD_COUNT, getClass().getSimpleName() + "-Thread");
+    private ExecutorServiceHandle constructUnderTest(ThreadNameFactory threadNameFactory) {
+        return new ExecutorServiceHandle(THREAD_COUNT, threadNameFactoryMock);
     }
 }

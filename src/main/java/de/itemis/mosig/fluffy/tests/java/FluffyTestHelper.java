@@ -1,5 +1,8 @@
 package de.itemis.mosig.fluffy.tests.java;
 
+import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyExecutors.kill;
+import static de.itemis.mosig.fluffy.tests.java.sneaky.Sneaky.throwThat;
+import static java.lang.Thread.currentThread;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isPrivate;
 import static java.lang.reflect.Modifier.isStatic;
@@ -16,9 +19,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Condition;
 
@@ -190,5 +200,31 @@ public final class FluffyTestHelper {
 
         assertThatThrownBy(() -> code.run()).as("NullPointerException is expected when methods encounter null for argument '" + argName + "'.")
             .isInstanceOf(NullPointerException.class).as("Argument name '" + argName + "' is missing in exception's message").hasMessageContaining(argName);
+    }
+
+    /**
+     * Sleeps for the specified {@code waitingTime}. Thread interruptions are respected. In case of
+     * interruption the thread interrupt flag will be preserved.
+     *
+     * @param waitingTime - Precision is milliseconds.
+     * @throws InterruptedException - In case the sleeping thread is interrupted.
+     */
+    public static void sleep(Duration waitingTime) {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        ScheduledFuture<?> future = executorService.schedule(() -> latch.countDown(), waitingTime.toMillis(), TimeUnit.MILLISECONDS);
+
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            currentThread().interrupt();
+            throwThat(e);
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            fail("This should never happen.", cause);
+        } finally {
+            kill(executorService);
+        }
     }
 }

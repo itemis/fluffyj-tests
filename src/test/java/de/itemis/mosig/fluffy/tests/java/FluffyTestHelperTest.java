@@ -2,17 +2,31 @@ package de.itemis.mosig.fluffy.tests.java;
 
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertNullArgNotAccepted;
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertSerialVersionUid;
+import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.sleep;
+import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyExecutors.kill;
+import static de.itemis.mosig.fluffy.tests.java.concurrency.FluffyLatches.assertLatch;
 import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_UNCHECKED_EXCEPTION;
+import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class FluffyTestHelperTest {
+
+    private static final Duration EXPECTED_SLEEP_TIME = Duration.ofMillis(800);
 
     // No serialVersionUID by intention
     @SuppressWarnings("serial")
@@ -70,6 +84,39 @@ public class FluffyTestHelperTest {
     public void assert_null_arg_does_not_accept_nulls() {
         assertNullArgNotAccepted(() -> assertNullArgNotAccepted(null, "argConsumer"), "argConsumer");
         assertNullArgNotAccepted(() -> assertNullArgNotAccepted(() -> toString(), null), "argName");
+    }
+
+    @Test
+    public void sleep_sleeps_for_the_specified_time() {
+        long startMillis = System.currentTimeMillis();
+        sleep(EXPECTED_SLEEP_TIME);
+        long stopMillis = System.currentTimeMillis();
+
+        assertThat(stopMillis - startMillis).as("Method did not sleep long enough.").isGreaterThanOrEqualTo(EXPECTED_SLEEP_TIME.toMillis());
+    }
+
+    @Test
+    public void sleep_is_interruptible_and_preserves_interrupt_flag() throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean interruptFlagSet = new AtomicBoolean(false);
+        Future<?> future = executor.submit(() -> {
+            latch.countDown();
+            try {
+                sleep(EXPECTED_SLEEP_TIME);
+            } catch (Throwable t) {
+                interruptFlagSet.set(currentThread().isInterrupted());
+                throw t;
+            }
+            return null;
+        });
+
+        assertLatch(latch, EXPECTED_SLEEP_TIME);
+        Thread.sleep(200);
+        kill(executor);
+
+        assertThat(future).failsWithin(EXPECTED_SLEEP_TIME).withThrowableOfType(ExecutionException.class).withCauseInstanceOf(InterruptedException.class);
+        assertThat(interruptFlagSet).as("In case sleep is interrupted, the interrupt flag must be preserved.").isTrue();
     }
 
     private void nullSafeTestMethod(Object arg) {

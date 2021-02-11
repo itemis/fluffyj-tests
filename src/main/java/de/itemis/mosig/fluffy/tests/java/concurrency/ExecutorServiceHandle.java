@@ -31,15 +31,17 @@ public final class ExecutorServiceHandle {
      *
      * @param threadCount - How many threads may be running in parallel? Must be greater than or
      *        equal to zero (gte 0).
-     * @param threadNamePrefix - The names of all created threads will start with this
-     *        {@link String}.
+     * @param threadNameFactory - All threads will have names created by this factory.
      */
-    public ExecutorServiceHandle(int threadCount, String threadNamePrefix) {
+    public ExecutorServiceHandle(int threadCount, ThreadNameFactory threadNameFactory) {
         checkArgument(threadCount > 0, "Thread count must be gte 0.");
-        requireNonNull(threadNamePrefix, "expectedName");
+        requireNonNull(threadNameFactory, "threadNameFactory");
 
         this.threadCount = threadCount;
-        this.threadFactory = task -> new Thread(task, threadNamePrefix);
+        this.threadFactory = task -> {
+            String id = threadNameFactory.generate();
+            return new Thread(task, id);
+        };
     }
 
     /**
@@ -59,7 +61,6 @@ public final class ExecutorServiceHandle {
                 }
             }
         }
-
         return executorService;
     }
 
