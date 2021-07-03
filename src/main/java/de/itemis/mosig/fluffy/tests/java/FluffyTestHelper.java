@@ -8,9 +8,8 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import org.assertj.core.api.Condition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -20,6 +19,8 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.assertj.core.api.Condition;
 
 import de.itemis.mosig.fluffy.tests.java.exceptions.InstantiationNotPermittedException;
 
@@ -174,5 +175,20 @@ public final class FluffyTestHelper {
         }, "private static final long serialVersionUID");
 
         assertThat(clazz.getDeclaredFields()).haveAtLeastOne(serialVersionUID);
+    }
+
+    /**
+     * Assert that {@code code} throws a {@link NullPointerException} with {@code argName} in its
+     * message. May be used to test if a method properly handles null arguments.
+     *
+     * @param code The code to run.
+     * @param argName Must be contained in the expected {@link NullPointerException}.
+     */
+    public static void assertNullArgNotAccepted(Runnable code, String argName) {
+        requireNonNull(code, "argConsumer");
+        requireNonNull(argName, "argName");
+
+        assertThatThrownBy(() -> code.run()).as("NullPointerException is expected when methods encounter null for argument '" + argName + "'.")
+            .isInstanceOf(NullPointerException.class).as("Argument name '" + argName + "' is missing in exception's message").hasMessageContaining(argName);
     }
 }
