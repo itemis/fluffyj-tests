@@ -2,14 +2,17 @@ package de.itemis.mosig.fluffy.tests.java.exceptions;
 
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertIsStaticHelper;
 import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_ERROR;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_ERROR_MESSAGE;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_MESSAGE;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_THROWABLE;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_THROWABLE_MESSAGE;
 import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_UNCHECKED_EXCEPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
 public class ExpectedExceptionsTest {
-
-    private final String expectedMessage = "Expected exception. Please ignore.";
 
     @Test
     public void is_proper_static_helper() {
@@ -18,7 +21,7 @@ public class ExpectedExceptionsTest {
 
     @Test
     public void expected_runtime_exception_has_proper_message() {
-        assertThat(EXPECTED_UNCHECKED_EXCEPTION).hasMessage(expectedMessage);
+        assertThat(EXPECTED_UNCHECKED_EXCEPTION).hasMessage(EXPECTED_MESSAGE);
     }
 
     @Test
@@ -28,7 +31,7 @@ public class ExpectedExceptionsTest {
 
     @Test
     public void expected_checked_exception_has_proper_message() {
-        assertThat(EXPECTED_CHECKED_EXCEPTION).hasMessage(expectedMessage);
+        assertThat(EXPECTED_CHECKED_EXCEPTION).hasMessage(EXPECTED_MESSAGE);
     }
 
     @Test
@@ -37,7 +40,22 @@ public class ExpectedExceptionsTest {
     }
 
     @Test
-    public void expected_message_has_proper_content() {
-        assertThat(ExpectedExceptions.EXPECTED_MESSAGE).isEqualTo(expectedMessage);
+    public void expected_throwable_is_a_throwable() {
+        assertThat(EXPECTED_THROWABLE).isExactlyInstanceOf(Throwable.class);
+    }
+
+    @Test
+    public void expected_throwable_has_proper_message() {
+        assertThat(EXPECTED_THROWABLE).hasMessage(EXPECTED_THROWABLE_MESSAGE);
+    }
+
+    @Test
+    public void expected_error_is_an_error() {
+        assertThat(EXPECTED_ERROR).isExactlyInstanceOf(Error.class);
+    }
+
+    @Test
+    public void expected_error_has_proper_message() {
+        assertThat(EXPECTED_ERROR).hasMessage(EXPECTED_ERROR_MESSAGE);
     }
 }
