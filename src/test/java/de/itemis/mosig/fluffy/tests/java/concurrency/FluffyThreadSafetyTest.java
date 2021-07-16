@@ -19,15 +19,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor.Invocation;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.HashSet;
@@ -42,8 +33,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-// We do want to initialize mocks when we want, even if not used later on.
-// This is bc we value test readability more than resource savings.
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor.Invocation;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
+// We do want to chose the time mocks are initialized by ourselves, even if they are not used later
+// on.
+// This is because we value test readability more than resource savings.
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class FluffyThreadSafetyTest {
 
@@ -354,7 +355,7 @@ public class FluffyThreadSafetyTest {
             getTargetLatch.countDown();
             return Optional.of(FluffyThreadSafetyTest.this);
         });
-        when(invocationContextMock.getArguments()).thenReturn(asList((Object[]) args));
+        when(invocationContextMock.getArguments()).thenReturn(asList(args));
         when(invocationContextMock.getExecutable()).thenReturn(method);
 
         return method;

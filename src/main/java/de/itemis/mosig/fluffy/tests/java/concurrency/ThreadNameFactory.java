@@ -3,9 +3,9 @@ package de.itemis.mosig.fluffy.tests.java.concurrency;
 import java.util.function.Supplier;
 
 /**
- * A {@link Supplier} that is supposed to create vaiable names for threads. The names should be
+ * A {@link Supplier} that is supposed to create viable names for threads. The names should be
  * created in such a way so that threads can be easily distinguished from another. Implementations
- * are adviced but not forced to provide unique ids. Implementors should document how likely it is
+ * are advised but not forced to provide unique ids. Implementors should document how likely it is
  * that different threads will end up with the same name.
  */
 @FunctionalInterface

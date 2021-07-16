@@ -209,6 +209,8 @@ public final class FluffyTestHelper {
      * @param waitingTime - Precision is milliseconds.
      * @throws InterruptedException - In case the sleeping thread is interrupted.
      */
+    // Using an Executor based approach here in order to avoid "drift", i. e. sleeping shorter /
+    // longer than specified.
     public static void sleep(Duration waitingTime) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 

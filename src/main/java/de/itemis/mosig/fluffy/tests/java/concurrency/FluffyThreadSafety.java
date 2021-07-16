@@ -2,13 +2,6 @@ package de.itemis.mosig.fluffy.tests.java.concurrency;
 
 import static de.itemis.mosig.fluffy.tests.java.sneaky.Sneaky.throwThat;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.opentest4j.AssertionFailedError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,6 +11,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * A Junit5 based extension that runs a test concurrently in multiple threads to see if it behaves
+ * the same in all threads.
+ * 
+ * @see AssertThreadSafety for details on how to use it.
+ */
 public final class FluffyThreadSafety implements InvocationInterceptor {
 
     private static final Logger LOG = LoggerFactory.getLogger(FluffyThreadSafety.class);
@@ -39,12 +45,12 @@ public final class FluffyThreadSafety implements InvocationInterceptor {
                 var targetValue = target.get();
                 Object[] args = invocationContext.getArguments().toArray();
                 var errorMessagPrefix = "Cannot test thread safety: ";
-                CountDownLatch latch = new CountDownLatch(1);
+                CountDownLatch startAllThreadsLatch = new CountDownLatch(1);
                 List<Future<?>> futures = new ArrayList<>();
                 for (int i = 0; i < threadCount; i++) {
                     futures.add(executor.submit(() -> {
                         try {
-                            latch.await();
+                            startAllThreadsLatch.await();
                             method.invoke(targetValue, args);
                         } catch (IllegalAccessException e) {
                             fail(errorMessagPrefix + "Method is not accessible.", e);
@@ -67,7 +73,7 @@ public final class FluffyThreadSafety implements InvocationInterceptor {
                     }));
                 }
 
-                latch.countDown();
+                startAllThreadsLatch.countDown();
                 AssertionError error = new AssertionError("Encountered problems while running test in parallel. Look at suppressed exceptions.");
                 try {
                     for (var future : futures) {
