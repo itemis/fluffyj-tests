@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.itemis.mosig.fluffy</groupId>
-    <artifactId>de.itemis.mosig.fluffy.tests.java</artifactId>
+    <artifactId>de.itemis.mosig.fluffyj.tests</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>Fluffy Tests</name>
-    <description>A library that aims at making your test easier to understand.</description>
+    <name>Fluffy J Tests</name>
+    <description>Helper code that aims at making test code easier to comprehend. Also extra fluffy ❤</description>
 
     <packaging>jar</packaging>
 
@@ -34,9 +35,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/JanMosigItemis/fluffy-tests-java.git</connection>
+        <connection>scm:git:https://github.com/JanMosigItemis/fluffyj-tests.git</connection>
         <tag>HEAD</tag>
-        <url>https://github.com/JanMosigItemis/fluffy-tests-java.git</url>
+        <url>https://github.com/JanMosigItemis/fluffyj-tests.git</url>
     </scm>
 
     <organization>
@@ -44,7 +45,7 @@
         <url>www.itemis.com</url>
     </organization>
 
-    <url>https://github.com/JanMosigItemis/fluffy-tests-java</url>
+    <url>https://github.com/JanMosigItemis/fluffyj-tests</url>
 
     <properties>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
@@ -78,8 +79,9 @@
         <awaitility.version>4.0.3</awaitility.version>
         <wiremock.version>2.27.2</wiremock.version>
         <arch.unit.version>0.16.0</arch.unit.version>
-        <!-- Currently no custom options are set but we need to define this variable
-            anyway, so that it gets replaced with 'empty' upon runtime. -->
+        <fluffyj.version>1.0.0-SNAPSHOT</fluffyj.version>
+        <!-- Currently no custom options are set but we need to define this 
+            variable anyway, so that it gets replaced with 'empty' upon runtime. -->
         <custom.jvm.options></custom.jvm.options>
     </properties>
 
@@ -92,7 +94,7 @@
                 <version>${guava.version}</version>
             </dependency>
             <dependency>
-                <!-- Required to support null annotation checks according
+                <!-- Required to support null annotation checks according 
                     to JSR-305 -->
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs</artifactId>
@@ -171,6 +173,11 @@
                 <artifactId>wiremock</artifactId>
                 <version>${wiremock.version}</version>
             </dependency>
+            <dependency>
+                <groupId>de.itemis.mosig.fluffy</groupId>
+                <artifactId>de.itemis.mosig.fluffyj</artifactId>
+                <version>${fluffyj.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -184,7 +191,7 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
-            <!-- Required to support null annotation checks according to
+            <!-- Required to support null annotation checks according to 
                 JSR-305 -->
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs</artifactId>
@@ -226,8 +233,8 @@
             <artifactId>awaitility</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock</artifactId>
+            <groupId>de.itemis.mosig.fluffy</groupId>
+            <artifactId>de.itemis.mosig.fluffyj</artifactId>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.aventrix.jnanoid/jnanoid -->
 <dependency>
@@ -381,9 +388,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <!-- Try to avoid concurrency issues as much as possible. -->
-                    <!-- This will have a negative impact on memory consumption an build speed. -->
+                    <!-- This will have a negative impact on memory consumption 
+                        an build speed. -->
                     <reuseForks>false</reuseForks>
-                    <!-- $argLine is 'injected' by JaCoCo and contains instructions to setup its agent -->
+                    <!-- $argLine is 'injected' by JaCoCo and contains instructions 
+                        to setup its agent -->
                     <argLine>${argLine} ${custom.jvm.options}</argLine>
                 </configuration>
             </plugin>
@@ -423,70 +432,4 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>create_uber_jar</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <configuration>
-                            <!-- In some cases this could cause the resulting jar to malfunction. Set it to 'false' if this happens. -->
-                            <!-- If this causes a warning, see: https://issues.apache.org/jira/browse/MSHADE-366 -->
-                            <minimizeJar>true</minimizeJar>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>de.itemis.mosig.fluffy.tests.java.App</mainClass>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
-                                    <addHeader>false</addHeader>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                            </transformers>
-                            <!-- Shading breaks module encapsulation anyway,
-                                see: https://stackoverflow.com/questions/51751981/why-does-maven-shade-plugin-remove-module-info-class -->
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>**/module-info.class</exclude>
-                                        <!-- Only specify this if you are sure that no dependency requires the settings from its own MANIFEST.MF file -->
-                                        <exclude>META-INF/MANIFEST.MF</exclude>
-                                        <!-- filter out signature files from signed dependencies, else repackaging fails with security exception -->
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>ch.qos.logback:logback-core</artifact>
-                                    <includes>
-                                        <include>**</include>
-                                    </includes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>create_uber_jar</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                                    <shadedClassifierName>${current.os}</shadedClassifierName>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
