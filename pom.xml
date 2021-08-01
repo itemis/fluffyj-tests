@@ -5,9 +5,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.itemis</groupId>
+    <parent>
+        <groupId>com.itemis</groupId>
+        <artifactId>org-parent</artifactId>
+        <version>3</version>
+    </parent>
+
     <artifactId>fluffyj.tests</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <name>Fluffy J Tests</name>
     <description>Helper code that aims at making test code easier to comprehend. Also extra fluffy ❤</description>
@@ -79,7 +84,7 @@
         <awaitility.version>4.0.3</awaitility.version>
         <wiremock.version>2.27.2</wiremock.version>
         <arch.unit.version>0.16.0</arch.unit.version>
-        <fluffyj.version>1.3.0</fluffyj.version>
+        <fluffyj.version>1.4.0</fluffyj.version>
         <!-- Currently no custom options are set but we need to define this 
             variable anyway, so that it gets replaced with 'empty' upon runtime. -->
         <custom.jvm.options></custom.jvm.options>
@@ -237,12 +242,12 @@
             <artifactId>fluffyj</artifactId>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.aventrix.jnanoid/jnanoid -->
-<dependency>
-    <groupId>com.aventrix.jnanoid</groupId>
-    <artifactId>jnanoid</artifactId>
-    <version>2.0.0</version>
-</dependency>
-        
+        <dependency>
+            <groupId>com.aventrix.jnanoid</groupId>
+            <artifactId>jnanoid</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
