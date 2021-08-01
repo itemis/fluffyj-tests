@@ -25,6 +25,23 @@ import ch.qos.logback.core.AppenderBase;
  * It attaches itself as an appender before each test method and detaches itself afterwards via the
  * AfterEach hook. Thus it will also detach itself even if the test itself threw an exception.
  * </p>
+ * <p>
+ * Usage:
+ *
+ * <pre>
+ * public class SomeTest {
+ *     // Visibility must at least be package private
+ *     &#64;RegisterExtension
+       FluffyTestAppender logAssert = new FluffyTestAppender();
+
+       &#64;Test
+       public void testSomething() {
+           someApi.someSideEffect();
+           logAssert.assertLogContains(..);
+       }
+ * }
+ * </pre>
+ * </p>
  */
 public class FluffyTestAppender extends AppenderBase<ILoggingEvent> implements BeforeEachCallback, AfterEachCallback {
     private static final String LOGBACK_ROOT_LOGGER_NAME = ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME;
@@ -51,7 +68,7 @@ public class FluffyTestAppender extends AppenderBase<ILoggingEvent> implements B
      * WARN - I am a very fluffy log message
      * </pre>
      *
-     * then assert("WARN","very fluffy") will also work.
+     * then assert("WARN","very fluffy") will pass.
      * </p>
      */
     public void assertLogContains(Level logLevel, String logMsg) {

@@ -32,8 +32,8 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * <p>
  * <b>Be aware:</b> Due to the global nature of JVM system properties, using this extensions when
  * running multiple tests in parallel in the same JVM could be dangerous, because changing system
- * properties could interfere with other tests. Thus, make sure to run tests using this extension
- * isolated within an exclusive JVM.
+ * properties could interfere with other tests. Thus, you may want to make sure to run tests using
+ * this extension isolated within an exclusive JVM.
  * </p>
  */
 public final class FluffyTestSystemProperties implements BeforeEachCallback, AfterEachCallback {

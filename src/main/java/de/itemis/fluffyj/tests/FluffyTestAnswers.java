@@ -38,6 +38,14 @@ public final class FluffyTestAnswers {
         };
     }
 
+    /**
+     * When answer is invoked, run {@code code}. If {@code code} throws a {@link Throwable}, an
+     * {@link AssertionError} will be thrown.
+     *
+     * @param <T> Type of optional return value or {@link Void} if none.
+     * @param code Run this {@link Callable}
+     * @return Return value of {@code code}.
+     */
     public static <T> ChainedMockitoAnswer<T> execute(Callable<T> code) {
         return invocation -> {
             T result = null;
