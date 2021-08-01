@@ -101,7 +101,7 @@ when (mock.method()).thenAnswer(
 );
 ```
 
-Think of it as the Mockito kind of function composition. This is done by the help of the interface `de.itemis.fluffyj.tests.ChainedMockitoAnswer` which is a Mockito `Answer` but also provides `andThen`.  
+Think of it as the Mockito kind of function composition. This is done by the help of the interface `com.itemis.fluffyj.tests.ChainedMockitoAnswer` which is a Mockito `Answer` but also provides `andThen`.  
   
 The more implementations of `ChainedMockitoAnswer` exist, the stronger the effect becomes. There could also be answers for common mock behavior like sleeping, storing current time, counting down latches etc.
 
