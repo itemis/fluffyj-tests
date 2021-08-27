@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.itemis</groupId>
         <artifactId>org-parent</artifactId>
-        <version>3</version>
+        <version>5.2.0</version>
     </parent>
 
     <artifactId>fluffyj.tests</artifactId>
@@ -84,7 +84,7 @@
         <awaitility.version>4.0.3</awaitility.version>
         <wiremock.version>2.27.2</wiremock.version>
         <arch.unit.version>0.16.0</arch.unit.version>
-        <fluffyj.version>1.4.0</fluffyj.version>
+        <fluffyj.version>1.7.0</fluffyj.version>
         <!-- Currently no custom options are set but we need to define this 
             variable anyway, so that it gets replaced with 'empty' upon runtime. -->
         <custom.jvm.options></custom.jvm.options>
