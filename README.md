@@ -240,4 +240,4 @@ When mocking code to throw an exception often two problems arise:
 * Instantiating expected exceptions in every test method or class becomes tedious.
 * Developers tend to skip giving those exceptions a meaningful message, cluttering the test log with stacktraces that are not clearly identifiable as being intentional.
   
-To improve this situation, `ExpectedExceptions` provides instances of these `Exceptions´ (and `Throwables` and `Errors` respectively) so that developers may not need to come up with their own ones.
+To improve this situation, `ExpectedExceptions` provides instances of these `Exceptions` (and `Throwables` and `Errors` respectively) so that developers may not need to come up with their own ones.

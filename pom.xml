@@ -8,11 +8,11 @@
     <parent>
         <groupId>com.itemis</groupId>
         <artifactId>org-parent</artifactId>
-        <version>3</version>
+        <version>5.2.0</version>
     </parent>
 
     <artifactId>fluffyj.tests</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <name>Fluffy J Tests</name>
     <description>Helper code that aims at making test code easier to comprehend. Also extra fluffy ❤</description>
@@ -54,14 +54,8 @@
 
     <properties>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-        <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
-        <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
-        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>
-        <maven-help-plugin.version>3.0.1</maven-help-plugin.version>
         <java.version>11</java.version>
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -71,7 +65,6 @@
         <build.timestamp.formatted>${maven.build.timestamp}</build.timestamp.formatted>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm.ssZ</maven.build.timestamp.format>
         <resource.delimiter>${*}</resource.delimiter>
-        <guava.version>30.1-jre</guava.version>
         <mockito.version>3.7.7</mockito.version>
         <hamcrest.version>2.2</hamcrest.version>
         <spotbugs.version>4.2.0</spotbugs.version>
@@ -80,11 +73,8 @@
         <git-commit-id-plugin.version>4.0.3</git-commit-id-plugin.version>
         <assertj.version>3.19.0</assertj.version>
         <logback.version>1.2.3</logback.version>
-        <equalsverifier.version>3.5.2</equalsverifier.version>
-        <awaitility.version>4.0.3</awaitility.version>
-        <wiremock.version>2.27.2</wiremock.version>
         <arch.unit.version>0.16.0</arch.unit.version>
-        <fluffyj.version>1.4.0</fluffyj.version>
+        <fluffyj.version>1.7.0</fluffyj.version>
         <!-- Currently no custom options are set but we need to define this 
             variable anyway, so that it gets replaced with 'empty' upon runtime. -->
         <custom.jvm.options></custom.jvm.options>
@@ -92,19 +82,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <dependency>
-                <!-- Required to support null annotation checks according 
-                    to JSR-305 -->
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs</artifactId>
-                <version>${spotbugs.version}</version>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -121,12 +98,6 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.junit.vintage/junit-vintage-engine -->
-            <dependency>
-                <groupId>org.junit.vintage</groupId>
-                <artifactId>junit-vintage-engine</artifactId>
                 <version>${junit.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/com.tngtech.archunit/archunit-junit5 -->
@@ -160,24 +131,6 @@
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier -->
-            <dependency>
-                <groupId>nl.jqno.equalsverifier</groupId>
-                <artifactId>equalsverifier</artifactId>
-                <version>${equalsverifier.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitility.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/com.github.tomakehurst/wiremock -->
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock</artifactId>
-                <version>${wiremock.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.itemis</groupId>
                 <artifactId>fluffyj</artifactId>
@@ -188,18 +141,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <!-- Required to support null annotation checks according to 
-                JSR-305 -->
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -230,22 +173,8 @@
             <artifactId>assertj-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>nl.jqno.equalsverifier</groupId>
-            <artifactId>equalsverifier</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.itemis</groupId>
             <artifactId>fluffyj</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.aventrix.jnanoid/jnanoid -->
-        <dependency>
-            <groupId>com.aventrix.jnanoid</groupId>
-            <artifactId>jnanoid</artifactId>
-            <version>2.0.0</version>
         </dependency>
 
     </dependencies>
@@ -299,19 +228,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
                     <version>${spotbugs.version}</version>
@@ -328,11 +244,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>${maven-shade-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven-jar-plugin.version}</version>
                 </plugin>
@@ -340,25 +251,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>${maven-exec-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-help-plugin</artifactId>
-                    <version>${maven-help-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>show-profiles</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>active-profiles</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
