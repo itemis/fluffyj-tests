@@ -75,7 +75,7 @@
         <assertj.version>3.22.0</assertj.version>
         <logback.version>1.2.10</logback.version>
         <arch.unit.version>0.22.0</arch.unit.version>
-        <fluffyj.version>1.7.0</fluffyj.version>
+        <fluffyj.version>1.8.1</fluffyj.version>
         <!-- Disable class data sharing (CDS) to avoid a nasty JVM warning. -->
         <!-- This usually has only a very small impact on performance and memory usage. -->
         <!-- See https://stackoverflow.com/a/57957031 -->
