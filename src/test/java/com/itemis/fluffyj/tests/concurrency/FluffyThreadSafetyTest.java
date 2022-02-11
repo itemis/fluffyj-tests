@@ -19,6 +19,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor.Invocation;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.HashSet;
@@ -32,15 +41,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor.Invocation;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 // We do want to chose the time mocks are initialized by ourselves, even if they are not used later
 // on.
@@ -171,31 +171,6 @@ public class FluffyThreadSafetyTest {
         assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "If the method throws an AssertionError, then this error must be propagated.")
                 .isInstanceOf(AssertionError.class).hasMessage(EXPECTED_MESSAGE).hasNoCause();
-    }
-
-    /**
-     * Cannot use a Spy here. See:
-     * https://github.com/mockito/mockito/issues/2026#issuecomment-759052596
-     */
-    @Test
-    public void when_executable_throws_npe_assertion_error() throws Throwable {
-        Exception expectedNpe = new NullPointerException("expected");
-        Method realMethod = setupExecutable(TEST_METHOD_NO_ARGS);
-        Method methodMock = mock(Method.class);
-        when(methodMock.getDeclaredAnnotation(AssertThreadSafety.class)).thenReturn(realMethod.getDeclaredAnnotation(AssertThreadSafety.class));
-        when(methodMock.invoke(this)).thenAnswer(exceptionalAnswer(expectedNpe));
-        when(invocationContextMock.getExecutable()).thenReturn(methodMock);
-
-        assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
-            "If a NullPointerException occurs, an AssertionError must be thrown.")
-                .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asList().hasSize(DEFAULT_THREAD_COUNT).allMatch(suppressed -> {
-                    assertThat(suppressed).isInstanceOf(AssertionError.class);
-                    AssertionError actualSuppressed = (AssertionError) suppressed;
-                    assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Target was null.")
-                        .hasCause(expectedNpe);
-                    return true;
-                });
     }
 
     /**
