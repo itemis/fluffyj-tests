@@ -4,13 +4,13 @@ package com.itemis.fluffyj.tests.logging;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -81,6 +81,20 @@ public class FluffyTestAppender extends AppenderBase<ILoggingEvent> implements B
         }
 
         assertThat(matchFound).describedAs("Not found in log: [" + logLevel + "] " + logMsg).isTrue();
+    }
+
+    /**
+     * Assert that the log does not contain any message.
+     */
+    public void assertLogIsEmpty() {
+        assertThat(logEntries).as("Encountered unempty log").isEmpty();
+    }
+
+    /**
+     * Assert that the log contains at least one message.
+     */
+    public void assertLogIsNotEmpty() {
+        assertThat(logEntries).as("Encountered empty log").isNotEmpty();
     }
 
     private void internalAppend(ILoggingEvent event) {
