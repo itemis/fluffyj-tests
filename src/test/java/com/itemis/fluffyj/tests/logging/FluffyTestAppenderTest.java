@@ -86,6 +86,28 @@ public class FluffyTestAppenderTest {
         assertFail(Level.INFO, EXPECTED_MSG);
     }
 
+    @Test
+    public void no_log_means_log_is_empty() {
+        underTest.assertLogIsEmpty();
+    }
+
+    @Test
+    public void assertLogIsEmpty_fails_on_non_empty_log() {
+        LOG.info(EXPECTED_MSG);
+        assertThatThrownBy(() -> underTest.assertLogIsEmpty()).isInstanceOf(AssertionError.class).hasMessageContaining("Encountered unempty log");
+    }
+
+    @Test
+    public void calling_log_at_least_once_means_log_is_not_empty() {
+        LOG.info(EXPECTED_MSG);
+        underTest.assertLogIsNotEmpty();
+    }
+
+    @Test
+    public void assertLogIsNotEmpty_fails_on_empty_log() {
+        assertThatThrownBy(() -> underTest.assertLogIsNotEmpty()).isInstanceOf(AssertionError.class).hasMessageContaining("Encountered empty log");
+    }
+
     private void assertSuccess(Level expectedLevel, String expectedMessage) {
         Assertions.assertDoesNotThrow(() -> underTest.assertLogContains(expectedLevel, expectedMessage));
     }

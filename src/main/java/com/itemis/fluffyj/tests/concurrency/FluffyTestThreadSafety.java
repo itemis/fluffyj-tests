@@ -2,6 +2,17 @@ package com.itemis.fluffyj.tests.concurrency;
 
 import static com.itemis.fluffyj.sneaky.Sneaky.throwThat;
 
+import com.itemis.fluffyj.concurrency.ExecutorServiceHandle;
+import com.itemis.fluffyj.concurrency.ThreadNameFactory;
+import com.itemis.fluffyj.concurrency.UniqueShortIdThreadNameFactory;
+
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -11,17 +22,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.opentest4j.AssertionFailedError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.itemis.fluffyj.concurrency.ExecutorServiceHandle;
-import com.itemis.fluffyj.concurrency.ThreadNameFactory;
-import com.itemis.fluffyj.concurrency.UniqueShortIdThreadNameFactory;
 
 /**
  * A Junit5 based extension that runs a test concurrently in multiple threads to see if it behaves
@@ -68,8 +68,6 @@ public final class FluffyTestThreadSafety implements InvocationInterceptor {
                             } else {
                                 fail(errorMessagPrefix + "Method threw an exception.", cause);
                             }
-                        } catch (NullPointerException e) {
-                            fail(errorMessagPrefix + "Target was null.", e);
                         } catch (ExceptionInInitializerError e) {
                             fail(errorMessagPrefix + "Initialization failed.", e);
                         } catch (InterruptedException e) {
