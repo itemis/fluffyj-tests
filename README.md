@@ -4,7 +4,7 @@ Helper code that aims at making test code easier to comprehend. Also extra fluff
 This is not a replacement for the popular [AssertJ](https://assertj.github.io/doc/) or any of the other popular test helper libraries. However, I like my (unit) test code to feature a certain style and sometimes, it is hard to express things with the usual libraries without cluttering the test code with boilerplate. Thus, I developed a couple of helpers over the years which I think may also be useful for other people so I decided to provide this little library.
 
 # Build  
-Note: JDK >=17 is required for the build.  
+Note: JDK >=11 is required for the build.  
 
 `mvn clean install`
 
