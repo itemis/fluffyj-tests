@@ -9,6 +9,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -17,10 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class FluffyTestLatchesTest {
 
@@ -46,33 +46,33 @@ public class FluffyTestLatchesTest {
 
     @Test
     public void assert_latch_passes_if_latch_is_zero() {
-        CountDownLatch latch = new CountDownLatch(0);
+        var latch = new CountDownLatch(0);
         assertDoesNotThrow(() -> assertLatch(latch, DEFAULT_TIMEOUT));
     }
 
     @Test
     public void assert_latch_fails_if_latch_is_non_zero() {
-        CountDownLatch latch = new CountDownLatch(1);
+        var latch = new CountDownLatch(1);
         assertThatThrownBy(() -> assertLatch(latch, DEFAULT_TIMEOUT)).isInstanceOf(AssertionError.class)
             .hasMessageContaining("Waiting on latch to become zero timed out.");
     }
 
     @Test
     public void assert_latch_waits_timeout() {
-        CountDownLatch latch = new CountDownLatch(1);
-        Duration expectedDuration = Duration.ofSeconds(1);
-        long startTime = System.currentTimeMillis();
+        var latch = new CountDownLatch(1);
+        var expectedDuration = Duration.ofSeconds(1);
+        var startTime = System.currentTimeMillis();
         assertThatThrownBy(() -> assertLatch(latch, expectedDuration)).isInstanceOf(AssertionError.class);
-        long endTime = System.currentTimeMillis();
+        var endTime = System.currentTimeMillis();
         assertThat(endTime - startTime).as("Encountered unexpected assert waiting time.").isGreaterThanOrEqualTo(expectedDuration.toMillis());
     }
 
     @Test
     public void assert_fails_when_wait_is_interrupted_and_preserves_interrupt_flag() {
-        CountDownLatch latch = new CountDownLatch(1);
-        CountDownLatch futureStartedLatch = new CountDownLatch(1);
+        var latch = new CountDownLatch(1);
+        var futureStartedLatch = new CountDownLatch(1);
 
-        AtomicBoolean interruptedFlagPreserved = new AtomicBoolean(false);
+        var interruptedFlagPreserved = new AtomicBoolean(false);
         Future<?> future = executor.submit(() -> {
             futureStartedLatch.countDown();
             try {
@@ -90,8 +90,10 @@ public class FluffyTestLatchesTest {
         }
 
         kill(executor, DEFAULT_TIMEOUT);
-        assertThatThrownBy(() -> future.get(DEFAULT_TIMEOUT.toMillis(), MILLISECONDS)).isInstanceOf(ExecutionException.class)
-            .hasCauseInstanceOf(RuntimeException.class).getCause().hasMessageContaining("Was interrupted while waiting on latch to become zero.")
+        assertThatThrownBy(() -> future.get(DEFAULT_TIMEOUT.toMillis(), MILLISECONDS))
+            .isInstanceOf(ExecutionException.class)
+            .hasCauseInstanceOf(RuntimeException.class).cause()
+            .hasMessageContaining("Was interrupted while waiting on latch to become zero.")
             .hasCauseExactlyInstanceOf(InterruptedException.class);
 
         assertThat(interruptedFlagPreserved).as("Interrupted assert does not preserve interrupt flag.").isTrue();
