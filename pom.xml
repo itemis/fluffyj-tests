@@ -74,7 +74,7 @@
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
         <assertj.version>3.23.1</assertj.version>
         <logback.version>1.4.3</logback.version>
-        <arch.unit.version>0.23.1</arch.unit.version>
+        <arch.unit.version>1.0.0</arch.unit.version>
         <fluffyj.version>1.10.0</fluffyj.version>
         <!-- Disable class data sharing (CDS) to avoid a nasty JVM warning. -->
         <!-- This usually has only a very small impact on performance and memory usage. -->
