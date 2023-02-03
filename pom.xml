@@ -12,7 +12,7 @@
     </parent>
 
     <artifactId>fluffyj.tests</artifactId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.7.0</version>
 
     <name>Fluffy J Tests</name>
     <description>Helper code that aims at making test code easier to comprehend. Also extra fluffy ❤</description>
