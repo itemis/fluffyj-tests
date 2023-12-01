@@ -12,7 +12,7 @@
     </parent>
 
     <artifactId>fluffyj.tests</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.7.3-SNAPSHOT</version>
 
     <name>Fluffy J Tests</name>
     <description>Helper code that aims at making test code easier to comprehend. Also extra fluffy ❤</description>
@@ -75,7 +75,7 @@
         <assertj.version>3.24.2</assertj.version>
         <arch.unit.version>1.2.0</arch.unit.version>
         <logback.version>1.4.13</logback.version>
-        <fluffyj.version>1.13.1</fluffyj.version>
+        <fluffyj.version>1.13.2</fluffyj.version>
         <!-- Disable class data sharing (CDS) to avoid a nasty JVM warning. -->
         <!-- This usually has only a very small impact on performance and memory usage. -->
         <!-- See https://stackoverflow.com/a/57957031 -->
