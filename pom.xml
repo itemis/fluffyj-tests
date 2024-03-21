@@ -64,7 +64,7 @@
         <resource.delimiter>${*}</resource.delimiter>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <mockito.version>5.11.0</mockito.version>
         <hamcrest.version>2.2</hamcrest.version>
         <!-- Be aware: Spotbugs seems incompatible to JDK < 17 since 4.4.2 -->
