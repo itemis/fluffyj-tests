@@ -13,6 +13,7 @@ import static java.util.Collections.synchronizedSet;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -121,7 +122,8 @@ public class FluffyThreadSafetyTest {
         assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "Running an inaccessible method must throw an AssertionError.")
                 .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asList().hasSize(DEFAULT_THREAD_COUNT).allMatch(suppressed -> {
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
                     var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Method is not accessible.")
@@ -138,7 +140,8 @@ public class FluffyThreadSafetyTest {
         assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "Running a method with wrong parameters must throw an AssertionError.")
                 .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asList().hasSize(DEFAULT_THREAD_COUNT).allMatch(suppressed -> {
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
                     var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Method arguments are wrong.")
@@ -154,7 +157,8 @@ public class FluffyThreadSafetyTest {
         assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "If the method throws an exception, an AssertionError must be thrown.")
                 .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asList().hasSize(DEFAULT_THREAD_COUNT).allMatch(suppressed -> {
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
                     var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Method threw an exception.")
@@ -188,7 +192,8 @@ public class FluffyThreadSafetyTest {
         assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "If an ExceptionInitializeError occurs, an AssertionError must be thrown.")
                 .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asList().hasSize(DEFAULT_THREAD_COUNT).allMatch(suppressed -> {
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
                     var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Initialization failed.")

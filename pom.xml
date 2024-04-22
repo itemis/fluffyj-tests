@@ -8,11 +8,11 @@
     <parent>
         <groupId>com.itemis</groupId>
         <artifactId>org-parent</artifactId>
-        <version>5.8.3</version>
+        <version>5.8.4</version>
     </parent>
 
     <artifactId>fluffyj.tests</artifactId>
-    <version>1.7.5-SNAPSHOT</version>
+    <version>1.7.5</version>
 
     <name>Fluffy J Tests</name>
     <description>Helper code that aims at making test code easier to comprehend. Also extra fluffy ❤</description>
@@ -75,7 +75,7 @@
         <assertj.version>3.25.3</assertj.version>
         <arch.unit.version>1.2.1</arch.unit.version>
         <logback.version>1.5.6</logback.version>
-        <fluffyj.version>1.13.3</fluffyj.version>
+        <fluffyj.version>1.13.4</fluffyj.version>
         <!-- Disable class data sharing (CDS) to avoid a nasty JVM warning. -->
         <!-- This usually has only a very small impact on performance and memory usage. -->
         <!-- See https://stackoverflow.com/a/57957031 -->
