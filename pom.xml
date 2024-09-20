@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.itemis</groupId>
         <artifactId>org-parent</artifactId>
-        <version>5.8.6</version>
+        <version>5.8.7</version>
     </parent>
 
     <artifactId>fluffyj.tests</artifactId>
@@ -62,7 +62,7 @@
         <build.timestamp.formatted>${maven.build.timestamp}</build.timestamp.formatted>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm.ssZ</maven.build.timestamp.format>
         <resource.delimiter>${*}</resource.delimiter>
-        <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.5.0</maven-surefire-plugin.version>
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <mockito.version>5.12.0</mockito.version>
