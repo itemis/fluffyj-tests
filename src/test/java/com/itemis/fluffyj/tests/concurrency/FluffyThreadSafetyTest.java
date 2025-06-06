@@ -291,7 +291,7 @@ public class FluffyThreadSafetyTest {
 
     @AssertThreadSafety
     public void test_method_runs_forever() {
-        while (!stopMethod.get()) {
+        while (!stopMethod.get() && !Thread.currentThread().isInterrupted()) {
 
         }
     }
