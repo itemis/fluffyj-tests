@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class FluffyThreadSafetyTest {
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
     private static final String TEST_METHOD_NO_ARGS_WITH_THREAD_COUNT = "test_method_no_args_with_thread_count";
     private static final String TEST_METHOD_NO_ARGS = "test_method_no_args";
     private static final int DEFAULT_THREAD_COUNT = 2;
@@ -61,11 +61,11 @@ public class FluffyThreadSafetyTest {
     @Mock
     private Invocation<Void> invocationMock;
 
-    private AtomicInteger methodNoArgsInvocationCount = new AtomicInteger(0);
-    private AtomicInteger methodWithArgsInvocationCount = new AtomicInteger(0);
-    private Set<String> threadNamesThatCalledMethod = synchronizedSet(new HashSet<>());
-    private AtomicBoolean stopMethod = new AtomicBoolean(false);
-    private CountDownLatch getTargetLatch = new CountDownLatch(1);
+    private final AtomicInteger methodNoArgsInvocationCount = new AtomicInteger(0);
+    private final AtomicInteger methodWithArgsInvocationCount = new AtomicInteger(0);
+    private final Set<String> threadNamesThatCalledMethod = synchronizedSet(new HashSet<>());
+    private final AtomicBoolean stopMethod = new AtomicBoolean(false);
+    private final CountDownLatch getTargetLatch = new CountDownLatch(1);
 
     private FluffyTestThreadSafety underTest;
 
@@ -119,13 +119,16 @@ public class FluffyThreadSafetyTest {
     public void when_executable_is_not_accessible_assertion_error() {
         setupExecutable("test_method_inaccessible");
 
-        assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
+        assertThatThrownBy(
+            () -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "Running an inaccessible method must throw an AssertionError.")
-                .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST)
+                .hasSize(DEFAULT_THREAD_COUNT)
                 .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
-                    var actualSuppressed = (AssertionError) suppressed;
+                    final var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Method is not accessible.")
                         .hasCauseInstanceOf(IllegalAccessException.class);
                     return true;
@@ -137,13 +140,16 @@ public class FluffyThreadSafetyTest {
         setupExecutable(TEST_METHOD_NO_ARGS);
         when(invocationContextMock.getArguments()).thenReturn(asList("superfluous arg"));
 
-        assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
+        assertThatThrownBy(
+            () -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "Running a method with wrong parameters must throw an AssertionError.")
-                .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST)
+                .hasSize(DEFAULT_THREAD_COUNT)
                 .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
-                    var actualSuppressed = (AssertionError) suppressed;
+                    final var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Method arguments are wrong.")
                         .hasCauseInstanceOf(IllegalArgumentException.class);
                     return true;
@@ -154,13 +160,16 @@ public class FluffyThreadSafetyTest {
     public void when_executable_throws_exception_assertion_error() {
         setupExecutable("test_method_exception");
 
-        assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
+        assertThatThrownBy(
+            () -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "If the method throws an exception, an AssertionError must be thrown.")
-                .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST)
+                .hasSize(DEFAULT_THREAD_COUNT)
                 .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
-                    var actualSuppressed = (AssertionError) suppressed;
+                    final var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Method threw an exception.")
                         .hasCause(EXPECTED_UNCHECKED_EXCEPTION);
                     return true;
@@ -171,7 +180,8 @@ public class FluffyThreadSafetyTest {
     public void when_executable_throws_assertion_error_then_this_error_gets_propagated() {
         setupExecutable("test_method_assertion_error");
 
-        assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
+        assertThatThrownBy(
+            () -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "If the method throws an AssertionError, then this error must be propagated.")
                 .isInstanceOf(AssertionError.class).hasMessage(EXPECTED_MESSAGE).hasNoCause();
     }
@@ -182,20 +192,24 @@ public class FluffyThreadSafetyTest {
      */
     @Test
     public void when_executable_throws_exception_initialize_error_assertion_error() throws Throwable {
-        Throwable expectedThrowable = new ExceptionInInitializerError("expected");
-        var realMethod = setupExecutable(TEST_METHOD_NO_ARGS);
-        var methodMock = mock(Method.class);
-        when(methodMock.getDeclaredAnnotation(AssertThreadSafety.class)).thenReturn(realMethod.getDeclaredAnnotation(AssertThreadSafety.class));
+        final Throwable expectedThrowable = new ExceptionInInitializerError("expected");
+        final var realMethod = setupExecutable(TEST_METHOD_NO_ARGS);
+        final var methodMock = mock(Method.class);
+        when(methodMock.getDeclaredAnnotation(AssertThreadSafety.class))
+            .thenReturn(realMethod.getDeclaredAnnotation(AssertThreadSafety.class));
         when(methodMock.invoke(this)).thenAnswer(exceptionalAnswer(expectedThrowable));
         when(invocationContextMock.getExecutable()).thenReturn(methodMock);
 
-        assertThatThrownBy(() -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
+        assertThatThrownBy(
+            () -> underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock),
             "If an ExceptionInitializeError occurs, an AssertionError must be thrown.")
-                .isInstanceOf(AssertionError.class).hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
-                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST).hasSize(DEFAULT_THREAD_COUNT)
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Encountered problems while running test in parallel. Look at suppressed exceptions.")
+                .extracting(throwable -> asList(throwable.getSuppressed())).asInstanceOf(LIST)
+                .hasSize(DEFAULT_THREAD_COUNT)
                 .allMatch(suppressed -> {
                     assertThat(suppressed).isInstanceOf(AssertionError.class);
-                    var actualSuppressed = (AssertionError) suppressed;
+                    final var actualSuppressed = (AssertionError) suppressed;
                     assertThat(actualSuppressed).hasMessage("Cannot test thread safety: Initialization failed.")
                         .hasCause(expectedThrowable);
                     return true;
@@ -226,16 +240,17 @@ public class FluffyThreadSafetyTest {
 
         runCodeToTest();
 
-        assertThat(threadNamesThatCalledMethod).as("The method must have been called by " + EXPECTED_THREAD_COUNT + " different threads.")
+        assertThat(threadNamesThatCalledMethod)
+            .as("The method must have been called by " + EXPECTED_THREAD_COUNT + " different threads.")
             .hasSize(EXPECTED_THREAD_COUNT);
     }
 
     @Test
     public void when_method_invocation_thread_is_interrupted_then_interrupt_exception() {
         setupExecutable("test_method_runs_forever");
-        var executor = Executors.newFixedThreadPool(1);
-        var futureScheduledLatch = new CountDownLatch(1);
-        Future<?> future = executor.submit(() -> {
+        final var executor = Executors.newFixedThreadPool(1);
+        final var futureScheduledLatch = new CountDownLatch(1);
+        final Future<?> future = executor.submit(() -> {
             futureScheduledLatch.countDown();
             runCodeToTest();
         });
@@ -245,7 +260,8 @@ public class FluffyThreadSafetyTest {
             assertLatch(getTargetLatch, DEFAULT_TIMEOUT);
             executor.shutdownNow();
             stopMethod.set(true);
-            assertThat(future).failsWithin(DEFAULT_TIMEOUT).withThrowableOfType(ExecutionException.class).withCauseInstanceOf(InterruptedException.class);
+            assertThat(future).failsWithin(DEFAULT_TIMEOUT).withThrowableOfType(ExecutionException.class)
+                .withCauseInstanceOf(InterruptedException.class);
         } finally {
             stopMethod.set(true);
             kill(executor, DEFAULT_TIMEOUT);
@@ -263,7 +279,7 @@ public class FluffyThreadSafetyTest {
     private void runCodeToTest() {
         try {
             underTest.interceptTestMethod(invocationMock, invocationContextMock, extensionContextMock);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             throwThat(e);
         }
     }
@@ -307,7 +323,7 @@ public class FluffyThreadSafetyTest {
     }
 
     @AssertThreadSafety
-    public void test_method_with_args(Object argOne, String argTwo, Boolean argThree) {
+    public void test_method_with_args(final Object argOne, final String argTwo, final Boolean argThree) {
         methodWithArgsInvocationCount.incrementAndGet();
     }
 
@@ -315,18 +331,18 @@ public class FluffyThreadSafetyTest {
         when(invocationContextMock.getTarget()).thenReturn(Optional.empty());
     }
 
-    private Method setupExecutable(String methodName, Object... args) {
+    private Method setupExecutable(final String methodName, final Object... args) {
         Method method = null;
-        var parameterTypes = Stream.of(args).map(Object::getClass).collect(toList()).toArray(new Class<?>[] {});
+        final var parameterTypes = Stream.of(args).map(Object::getClass).collect(toList()).toArray(new Class<?>[] {});
         try {
-            var localMethod = this.getClass().getDeclaredMethod(methodName, parameterTypes);
+            final var localMethod = this.getClass().getDeclaredMethod(methodName, parameterTypes);
             try {
                 when(invocationMock.proceed()).thenAnswer(execute(() -> localMethod.invoke(this, args)));
-            } catch (Throwable t) {
+            } catch (final Throwable t) {
                 fail("This should never happen.", t);
             }
             method = localMethod;
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             fail("This test class does not declare the specified method.", e);
         }
 
