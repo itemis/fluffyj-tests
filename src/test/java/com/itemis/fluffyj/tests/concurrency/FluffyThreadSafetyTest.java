@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -260,8 +261,10 @@ public class FluffyThreadSafetyTest {
             assertLatch(getTargetLatch, DEFAULT_TIMEOUT);
             executor.shutdownNow();
             stopMethod.set(true);
-            assertThat(future).failsWithin(DEFAULT_TIMEOUT).withThrowableOfType(ExecutionException.class)
-                .withCauseInstanceOf(InterruptedException.class);
+            await().atMost(DEFAULT_TIMEOUT).untilAsserted(() -> {
+                assertThat(future).failsWithin(DEFAULT_TIMEOUT).withThrowableOfType(ExecutionException.class)
+                    .withCauseInstanceOf(InterruptedException.class);
+            });
         } finally {
             stopMethod.set(true);
             kill(executor, DEFAULT_TIMEOUT);

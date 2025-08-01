@@ -76,6 +76,7 @@
         <arch.unit.version>1.4.1</arch.unit.version>
         <logback.version>1.5.18</logback.version>
         <fluffyj.version>1.13.6</fluffyj.version>
+        <awaitility.version>4.3.0</awaitility.version>
         <!-- Disable class data sharing (CDS) to avoid a nasty JVM warning. -->
         <!-- This usually has only a very small impact on performance and memory usage. -->
         <!-- See https://stackoverflow.com/a/57957031 -->
@@ -139,6 +140,11 @@
                 <artifactId>fluffyj</artifactId>
                 <version>${fluffyj.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -179,7 +185,11 @@
             <groupId>com.itemis</groupId>
             <artifactId>fluffyj</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
